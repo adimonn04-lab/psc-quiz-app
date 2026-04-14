@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PSC Quiz App</title>
+</head>
+<body style="font-family: Arial; text-align:center;">
+
+<h2>PSC Quiz</h2>
+
+<p id="question">Capital of Kerala?</p>
+
+<button onclick="check('A')">Kochi</button><br><br>
+<button onclick="check('B')">Kozhikode</button><br><br>
+<button onclick="check('C')">Thiruvananthapuram</button><br><br>
+<button onclick="check('D')">Thrissur</button><br><br>
+
+<h3 id="result"></h3>
+
+<script>
+function check(ans){
+  if(ans==='C'){
+    document.getElementById("result").innerText="✅ Correct!";
+  } else {
+    document.getElementById("result").innerText="❌ Wrong!";
+  }
+}
+</script>
+
+</body>
+</html>
