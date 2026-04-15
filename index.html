@@ -20,19 +20,31 @@ body {
 .screen { display:none; padding:20px; }
 .active { display:block; }
 
-/* Buttons */
-.main-btn {
-  width:100%;
-  padding:15px;
-  margin:10px 0;
-  background:#5CC9FF;
-  color:#0F111A;
-  border:none;
-  font-size:16px;
-  border-radius:10px;
+/* GRID MENU */
+.grid {
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  gap:15px;
 }
 
-/* Question Box */
+.card {
+  background:#1C1F2B;
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+  border:2px solid #2D313E;
+}
+
+.card:hover {
+  border:2px solid #5CC9FF;
+}
+
+.icon {
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+/* Question */
 .question {
   font-size:18px;
   margin-bottom:20px;
@@ -48,7 +60,6 @@ body {
   color:#94A3B8;
 }
 
-/* States */
 .selected {
   border:2px solid #5CC9FF;
   background:#16212E;
@@ -67,7 +78,17 @@ body {
   color:#FF5F5F;
 }
 
-/* Nav buttons */
+/* Buttons */
+.submit-btn {
+  background:#00C896;
+  color:#0F111A;
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:10px;
+}
+
 .nav {
   display:flex;
   justify-content:space-between;
@@ -82,13 +103,12 @@ body {
   border-radius:10px;
 }
 
-/* Submit */
-.submit-btn {
-  background:#00C896;
-  color:#0F111A;
+.main-btn {
   width:100%;
-  padding:12px;
-  margin-top:15px;
+  padding:15px;
+  margin-top:20px;
+  background:#5CC9FF;
+  color:#0F111A;
   border:none;
   border-radius:10px;
 }
@@ -98,20 +118,54 @@ body {
 
 <body>
 
-<!-- SUBJECT SCREEN -->
+<!-- SUBJECT GRID -->
 <div id="subjectScreen" class="screen active">
+
 <h2>Select Subject</h2>
 
-<button class="main-btn" onclick="startQuiz('maths')">Maths</button>
-<button class="main-btn" onclick="startQuiz('science')">Science</button>
-<button class="main-btn" onclick="startQuiz('social')">Social Science</button>
-<button class="main-btn" onclick="startQuiz('gk')">GK</button>
-<button class="main-btn" onclick="startQuiz('malayalam')">Malayalam</button>
-<button class="main-btn" onclick="startQuiz('english')">English</button>
+<div class="grid">
 
-<h3>OR</h3>
+<div class="card" onclick="startQuiz('maths')">
+<div class="icon">🔢</div>
+<p>Maths</p>
+</div>
 
-<button class="main-btn" onclick="startMock()">Mock Test</button>
+<div class="card" onclick="startQuiz('science')">
+<div class="icon">🧪</div>
+<p>Science</p>
+</div>
+
+<div class="card" onclick="startQuiz('social')">
+<div class="icon">🌍</div>
+<p>Social</p>
+</div>
+
+<div class="card" onclick="startQuiz('gk')">
+<div class="icon">🧠</div>
+<p>GK</p>
+</div>
+
+<div class="card" onclick="startQuiz('malayalam')">
+<div class="icon">📖</div>
+<p>Malayalam</p>
+</div>
+
+<div class="card" onclick="startQuiz('english')">
+<div class="icon">🔤</div>
+<p>English</p>
+</div>
+
+<div class="card" onclick="startQuiz('psychology')">
+<div class="icon">🧑‍🏫</div>
+<p>Psychology</p>
+</div>
+
+<div class="card" onclick="startMock()">
+<div class="icon">📝</div>
+<p>Mock Test</p>
+</div>
+
+</div>
 
 </div>
 
@@ -135,7 +189,7 @@ body {
 
 </div>
 
-<!-- RESULT SCREEN -->
+<!-- RESULT -->
 <div id="resultScreen" class="screen">
 <h2>Result</h2>
 <p id="finalScore"></p>
@@ -144,168 +198,135 @@ body {
 
 <script>
 
-/* SAMPLE DATABASE (you will expand to 200+) */
+/* DATABASE (Sample now — we expand to 200+) */
 const database = {
+
 maths: [
-{
-q:"5 + 3 = ?",
-options:["6","7","8","9"],
-answer:2,
-exp:"5 + 3 = 8"
-}
+{q:"5 + 3 = ?",options:["6","7","8","9"],answer:2,exp:"5 + 3 = 8"}
 ],
+
 science: [
-{
-q:"മനുഷ്യ ശരീരത്തിലെ ഏറ്റവും വലിയ അവയവം ഏത്?",
-options:["ഹൃദയം","ത്വക്ക്","ശ്വാസകോശം","കരൾ"],
-answer:1,
-exp:"ത്വക്ക് ആണ് ഏറ്റവും വലിയ അവയവം."
-}
+{q:"മനുഷ്യ ശരീരത്തിലെ ഏറ്റവും വലിയ അവയവം ഏത്?",options:["ഹൃദയം","ത്വക്ക്","ശ്വാസകോശം","കരൾ"],answer:1,exp:"ത്വക്ക് ആണ് ഏറ്റവും വലിയ അവയവം."}
 ],
+
 social: [
-{
-q:"കേരളത്തിന്റെ തലസ്ഥാനം ഏത്?",
-options:["കൊച്ചി","തിരുവനന്തപുരം","കോഴിക്കോട്","കണ്ണൂർ"],
-answer:1,
-exp:"തിരുവനന്തപുരം ആണ് കേരളത്തിന്റെ തലസ്ഥാനം."
-}
+{q:"കേരളത്തിന്റെ തലസ്ഥാനം ഏത്?",options:["കൊച്ചി","തിരുവനന്തപുരം","കോഴിക്കോട്","കണ്ണൂർ"],answer:1,exp:"തിരുവനന്തപുരം ആണ് തലസ്ഥാനം."}
 ],
+
 gk: [
-{
-q:"ഇന്ത്യയുടെ ദേശീയ മൃഗം ഏത്?",
-options:["സിംഹം","കടുവ","ആന","ചീറ്റ"],
-answer:1,
-exp:"കടുവയാണ് ദേശീയ മൃഗം."
-}
+{q:"ഇന്ത്യയുടെ ദേശീയ മൃഗം ഏത്?",options:["സിംഹം","കടുവ","ആന","ചീറ്റ"],answer:1,exp:"കടുവയാണ് ദേശീയ മൃഗം."}
 ],
+
 malayalam: [
-{
-q:"'കവിത' എന്നത് എന്താണ്?",
-options:["കഥ","ലേഖനം","പദ്യരൂപം","നോവൽ"],
-answer:2,
-exp:"പദ്യരൂപത്തിലുള്ള സാഹിത്യം ആണ് കവിത."
-}
+{q:"'കവിത' എന്നത് എന്താണ്?",options:["കഥ","ലേഖനം","പദ്യരൂപം","നോവൽ"],answer:2,exp:"പദ്യരൂപത്തിലുള്ള സാഹിത്യം ആണ് കവിത."}
 ],
+
 english: [
-{
-q:"Which is a noun?",
-options:["Run","Beautiful","Book","Quickly"],
-answer:2,
-exp:"Book is a noun."
-}
+{q:"Which is a noun?",options:["Run","Beautiful","Book","Quickly"],answer:2,exp:"Book is a noun."}
+],
+
+psychology: [
+{q:"Learning by imitation is called?",options:["Insight","Trial","Observation","Conditioning"],answer:2,exp:"Learning by observing others is called observational learning."}
 ]
+
 };
 
-let currentSubject = "";
-let questions = [];
-let index = 0;
-let score = 0;
-let selected = null;
+let questions=[],index=0,score=0,selected=null;
 
-/* START QUIZ */
-function startQuiz(subject){
-currentSubject = subject;
-questions = database[subject];
+/* START */
+function startQuiz(sub){
+questions = database[sub];
 start();
 }
 
-/* MOCK */
 function startMock(){
-questions = [
-...database.maths,
-...database.science,
-...database.social,
-...database.gk,
-...database.malayalam,
-...database.english
-];
+questions = [].concat(
+database.maths,
+database.science,
+database.social,
+database.gk,
+database.malayalam,
+database.english,
+database.psychology
+);
 start();
 }
 
 function start(){
-index = 0;
-score = 0;
-showScreen("quizScreen");
+index=0;score=0;
+show("quizScreen");
 loadQ();
 }
 
-/* LOAD QUESTION */
+/* LOAD */
 function loadQ(){
-selected = null;
+selected=null;
 document.getElementById("explanation").innerText="";
 
-let q = questions[index];
-document.getElementById("qText").innerText = q.q;
+let q=questions[index];
+document.getElementById("qText").innerText=q.q;
 
-let html = "";
-q.options.forEach((opt,i)=>{
-html += `<div class="option" onclick="selectOption(this,${i})">${opt}</div>`;
+let html="";
+q.options.forEach((o,i)=>{
+html+=`<div class="option" onclick="selectOpt(this,${i})">${o}</div>`;
 });
-document.getElementById("options").innerHTML = html;
+document.getElementById("options").innerHTML=html;
 }
 
 /* SELECT */
-function selectOption(el,i){
-selected = i;
-
+function selectOpt(el,i){
+selected=i;
 document.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
 el.classList.add("selected");
 }
 
 /* SUBMIT */
 function submitAnswer(){
-if(selected === null) return;
+if(selected==null)return;
 
-let q = questions[index];
-let opts = document.querySelectorAll(".option");
+let q=questions[index];
+let opts=document.querySelectorAll(".option");
 
-if(selected === q.answer){
+if(selected==q.answer){
 opts[selected].classList.add("correct");
 score++;
-} else {
+}else{
 opts[selected].classList.add("wrong");
 opts[q.answer].classList.add("correct");
 }
 
-document.getElementById("score").innerText = score;
-document.getElementById("explanation").innerText = q.exp;
+document.getElementById("score").innerText=score;
+document.getElementById("explanation").innerText=q.exp;
 }
 
 /* NAV */
 function nextQ(){
-if(index < questions.length-1){
-index++;
-loadQ();
-} else {
-finish();
-}
+if(index<questions.length-1){index++;loadQ();}
+else finish();
 }
 
 function prevQ(){
-if(index > 0){
-index--;
-loadQ();
-}
+if(index>0){index--;loadQ();}
 }
 
 /* RESULT */
 function finish(){
-showScreen("resultScreen");
-document.getElementById("finalScore").innerText =
-"Score: " + score + " / " + questions.length;
+show("resultScreen");
+document.getElementById("finalScore").innerText=
+"Score: "+score+" / "+questions.length;
 }
 
-/* SCREEN SWITCH */
-function showScreen(id){
+/* UI */
+function show(id){
 document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
 function restart(){
-showScreen("subjectScreen");
+show("subjectScreen");
 }
 
 </script>
 
 </body>
-</html>
+  </html>
