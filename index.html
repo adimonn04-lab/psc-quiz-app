@@ -2,13 +2,11 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>PSC Quiz App</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 
 <style>
-
 body {
   margin:0;
   font-family: 'Roboto Mono', monospace;
@@ -20,7 +18,7 @@ body {
 .screen { display:none; padding:20px; }
 .active { display:block; }
 
-/* GRID MENU */
+/* Grid */
 .grid {
   display:grid;
   grid-template-columns: repeat(2,1fr);
@@ -29,26 +27,16 @@ body {
 
 .card {
   background:#1C1F2B;
-  border-radius:15px;
   padding:20px;
+  border-radius:15px;
   text-align:center;
   border:2px solid #2D313E;
 }
 
-.card:hover {
-  border:2px solid #5CC9FF;
-}
-
-.icon {
-  font-size:30px;
-  margin-bottom:10px;
-}
+.icon { font-size:28px; }
 
 /* Question */
-.question {
-  font-size:18px;
-  margin-bottom:20px;
-}
+.question { font-size:18px; margin-bottom:15px; }
 
 /* Options */
 .option {
@@ -79,14 +67,18 @@ body {
 }
 
 /* Buttons */
-.submit-btn {
-  background:#00C896;
-  color:#0F111A;
+.btn {
   width:100%;
   padding:12px;
-  margin-top:15px;
+  margin-top:10px;
   border:none;
   border-radius:10px;
+  background:#5CC9FF;
+  color:#0F111A;
+}
+
+.submit {
+  background:#00C896;
 }
 
 .nav {
@@ -94,95 +86,38 @@ body {
   justify-content:space-between;
 }
 
-.small-btn {
+.small {
   width:48%;
-  padding:12px;
-  background:#5CC9FF;
-  color:#0F111A;
-  border:none;
-  border-radius:10px;
 }
-
-.main-btn {
-  width:100%;
-  padding:15px;
-  margin-top:20px;
-  background:#5CC9FF;
-  color:#0F111A;
-  border:none;
-  border-radius:10px;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- SUBJECT GRID -->
-<div id="subjectScreen" class="screen active">
-
+<!-- HOME -->
+<div id="home" class="screen active">
 <h2>Select Subject</h2>
 
 <div class="grid">
-
-<div class="card" onclick="startQuiz('maths')">
-<div class="icon">🔢</div>
-<p>Maths</p>
+<div class="card" onclick="start('psychology')"><div class="icon">🧑‍🏫</div>Psychology</div>
+<div class="card" onclick="start('maths')"><div class="icon">🔢</div>Maths</div>
+<div class="card" onclick="startMock()"><div class="icon">📝</div>Mock Test</div>
+</div>
 </div>
 
-<div class="card" onclick="startQuiz('science')">
-<div class="icon">🧪</div>
-<p>Science</p>
-</div>
+<!-- QUIZ -->
+<div id="quiz" class="screen">
 
-<div class="card" onclick="startQuiz('social')">
-<div class="icon">🌍</div>
-<p>Social</p>
-</div>
-
-<div class="card" onclick="startQuiz('gk')">
-<div class="icon">🧠</div>
-<p>GK</p>
-</div>
-
-<div class="card" onclick="startQuiz('malayalam')">
-<div class="icon">📖</div>
-<p>Malayalam</p>
-</div>
-
-<div class="card" onclick="startQuiz('english')">
-<div class="icon">🔤</div>
-<p>English</p>
-</div>
-
-<div class="card" onclick="startQuiz('psychology')">
-<div class="icon">🧑‍🏫</div>
-<p>Psychology</p>
-</div>
-
-<div class="card" onclick="startMock()">
-<div class="icon">📝</div>
-<p>Mock Test</p>
-</div>
-
-</div>
-
-</div>
-
-<!-- QUIZ SCREEN -->
-<div id="quizScreen" class="screen">
-
-<p id="qText" class="question"></p>
-
+<p id="question" class="question"></p>
 <div id="options"></div>
 
-<button class="submit-btn" onclick="submitAnswer()">Submit</button>
+<button class="btn submit" onclick="submit()">Submit</button>
 
 <p id="explanation"></p>
 
 <div class="nav">
-<button class="small-btn" onclick="prevQ()">Previous</button>
-<button class="small-btn" onclick="nextQ()">Next</button>
+<button class="btn small" onclick="prev()">Previous</button>
+<button class="btn small" onclick="next()">Next</button>
 </div>
 
 <p>Score: <span id="score">0</span></p>
@@ -190,203 +125,103 @@ body {
 </div>
 
 <!-- RESULT -->
-<div id="resultScreen" class="screen">
+<div id="result" class="screen">
 <h2>Result</h2>
-<p id="finalScore"></p>
-<button class="main-btn" onclick="restart()">Back to Home</button>
+<p id="final"></p>
+<button class="btn" onclick="goHome()">Home</button>
 </div>
 
 <script>
 
-/* DATABASE (Sample now — we expand to 200+) */
-const database = {
-
-maths: [
-{q:"5 + 3 = ?",options:["6","7","8","9"],answer:2,exp:"5 + 3 = 8"}
-],
-
-science: [
-{q:"മനുഷ്യ ശരീരത്തിലെ ഏറ്റവും വലിയ അവയവം ഏത്?",options:["ഹൃദയം","ത്വക്ക്","ശ്വാസകോശം","കരൾ"],answer:1,exp:"ത്വക്ക് ആണ് ഏറ്റവും വലിയ അവയവം."}
-],
-
-social: [
-{q:"കേരളത്തിന്റെ തലസ്ഥാനം ഏത്?",options:["കൊച്ചി","തിരുവനന്തപുരം","കോഴിക്കോട്","കണ്ണൂർ"],answer:1,exp:"തിരുവനന്തപുരം ആണ് തലസ്ഥാനം."}
-],
-
-gk: [
-{q:"ഇന്ത്യയുടെ ദേശീയ മൃഗം ഏത്?",options:["സിംഹം","കടുവ","ആന","ചീറ്റ"],answer:1,exp:"കടുവയാണ് ദേശീയ മൃഗം."}
-],
-
-malayalam: [
-{q:"'കവിത' എന്നത് എന്താണ്?",options:["കഥ","ലേഖനം","പദ്യരൂപം","നോവൽ"],answer:2,exp:"പദ്യരൂപത്തിലുള്ള സാഹിത്യം ആണ് കവിത."}
-],
-
-english: [
-{q:"Which is a noun?",options:["Run","Beautiful","Book","Quickly"],answer:2,exp:"Book is a noun."}
-],
+/* QUESTIONS */
+const DB = {
 
 psychology: [
-  {q:"അനുകരണത്തിലൂടെ പഠിക്കുന്നത് ഏത് പഠനരീതിയിലാണ് ഉൾപ്പെടുന്നത്?",
-options:["ട്രയൽ ആൻഡ് എറർ","ഇൻസൈറ്റ് ലേണിംഗ്","ഓബ്സർവേഷണൽ ലേണിംഗ്","കണ്ടീഷനിംഗ്"],
+{
+q:"അനുകരണത്തിലൂടെ പഠിക്കുന്നത് ഏത്?",
+options:["ട്രയൽ ആൻഡ് എറർ","ഇൻസൈറ്റ്","ഓബ്സർവേഷൻ","കണ്ടീഷനിംഗ്"],
 answer:2,
-exp:"ഓബ്സർവേഷണൽ ലേണിംഗ് (Observational Learning) എന്നത് മറ്റുള്ളവരുടെ പ്രവർത്തനം കാണുകയും അത് അനുകരിക്കുകയും ചെയ്യുന്നതിലൂടെ പഠിക്കുന്ന രീതിയാണ്. ആൽബർട്ട് ബാൻഡൂറയാണ് ഈ സിദ്ധാന്തം അവതരിപ്പിച്ചത്. ഉദാഹരണത്തിന്, ഒരു കുട്ടി അധ്യാപകനെ കാണിച്ച് എഴുതാൻ പഠിക്കുന്നത് ഈ രീതിയിലാണ്."
+exp:"മറ്റുള്ളവരുടെ പ്രവർത്തനം നിരീക്ഷിച്ച് അതിനെ അനുകരിച്ച് പഠിക്കുന്നതാണ് ഓബ്സർവേഷണൽ ലേണിംഗ്. ബാൻഡൂറയുടെ സിദ്ധാന്തത്തിൽ ഇത് പ്രധാനമാണ്."
 },
-
-  {q:"ട്രയൽ ആൻഡ് എറർ സിദ്ധാന്തം അവതരിപ്പിച്ചത് ആര്?",
+{
+q:"ട്രയൽ ആൻഡ് എറർ സിദ്ധാന്തം അവതരിപ്പിച്ചത് ആര്?",
 options:["സ്കിന്നർ","തോർണ്ടൈക്ക്","പാവ്ലോവ്","പിയാജെ"],
 answer:1,
-exp:"ട്രയൽ ആൻഡ് എറർ ലേണിംഗ് സിദ്ധാന്തം എഡ്വേർഡ് തോർണ്ടൈക്ക് ആണ് അവതരിപ്പിച്ചത്. ഈ സിദ്ധാന്തപ്രകാരം പഠനം ശ്രമങ്ങളും പിശകുകളും വഴി നടക്കുന്നു. ശരിയായ പ്രതികരണം കണ്ടെത്തുന്നതുവരെ വ്യക്തി പലതവണ ശ്രമിക്കുന്നു."},
-
-  {q:"കുട്ടികളുടെ ബൗദ്ധിക വികസന ഘട്ടങ്ങൾ അവതരിപ്പിച്ചത് ആര്?",
-options:["പാവ്ലോവ്","സ്കിന്നർ","പിയാജെ","ഫ്രോയ്ഡ്"],
-answer:2,
-exp:"ജീൻ പിയാജെ കുട്ടികളുടെ ബൗദ്ധിക വികസനത്തെ കുറിച്ച് നാല് ഘട്ടങ്ങൾ നിർദ്ദേശിച്ചു. ഇവയാണ് സെൻസറി-മോട്ടോർ, പ്രീ-ഓപ്പറേഷണൽ, കോൺക്രീറ്റ് ഓപ്പറേഷണൽ, ഫോർമൽ ഓപ്പറേഷണൽ ഘട്ടങ്ങൾ. ഓരോ ഘട്ടത്തിലും കുട്ടികളുടെ ചിന്താശേഷി വ്യത്യസ്തമാണ്."
+exp:"തോർണ്ടൈക്കിന്റെ ട്രയൽ ആൻഡ് എറർ സിദ്ധാന്തപ്രകാരം പഠനം പല ശ്രമങ്ങളും പിശകുകളും വഴി ശരിയായ ഉത്തരത്തിലേക്ക് എത്തുന്നതാണ്."
 },
-
 {
-q:"ക്ലാസിക്കൽ കണ്ടീഷനിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചത് ആര്?",
-options:["സ്കിന്നർ","പാവ്ലോവ്","തോർണ്ടൈക്ക്","ബാൻഡൂറ"],
+q:"IQ എന്തിന്റെ ചുരുക്കപ്പേരാണ്?",
+options:["Intelligent Quality","Intelligence Quotient","Internal Question","None"],
 answer:1,
-exp:"ഇവാൻ പാവ്ലോവ് ക്ലാസിക്കൽ കണ്ടീഷനിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചു. ഒരു സ്വാഭാവിക പ്രതികരണത്തെ ഒരു പുതിയ ഉത്തേജനവുമായി ബന്ധിപ്പിച്ച് പഠനം ഉണ്ടാകുന്നതാണ് ഇത്. നായയുടെ ലാലസ്രവ പരീക്ഷണം പ്രശസ്തമാണ്."
-},
-
-{
-q:"ഓപ്പറന്റ് കണ്ടീഷനിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചത് ആര്?",
-options:["പാവ്ലോവ്","സ്കിന്നർ","പിയാജെ","ബ്രൂണർ"],
-answer:1,
-exp:"ബി.എഫ്. സ്കിന്നർ ആണ് ഓപ്പറന്റ് കണ്ടീഷനിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചത്. ഇതിൽ പെരുമാറ്റം ബഹുമതി (reward) അല്ലെങ്കിൽ ശിക്ഷ (punishment) വഴി നിയന്ത്രിക്കപ്പെടുന്നു. നല്ല പെരുമാറ്റത്തിന് ബഹുമതി നൽകുമ്പോൾ അത് വർധിക്കും."
-},
-
-  {q:"ഇൻസൈറ്റ് ലേണിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചത് ആര്?",
-options:["കോഹ്ലർ","സ്കിന്നർ","പാവ്ലോവ്","തോർണ്ടൈക്ക്"],
-answer:0,
-exp:"വോൾഫ്ഗാങ് കോഹ്ലർ ആണ് ഇൻസൈറ്റ് ലേണിംഗ് സിദ്ധാന്തം അവതരിപ്പിച്ചത്. പ്രശ്നത്തിന് അപ്രതീക്ഷിതമായി പരിഹാരം കണ്ടെത്തുന്ന പഠനരീതിയാണ് ഇത്. ഇത് 'അഹാ അനുഭവം' എന്ന പേരിലും അറിയപ്പെടുന്നു."
-},
-
-{
-q:"ബഹുമതി നൽകുന്നത് ഏത് പ്രക്രിയയിൽ ഉൾപ്പെടുന്നു?",
-options:["പണിഷ്മെന്റ്","റീൻഫോഴ്‌സ്‌മെന്റ്","എക്സ്റ്റിങ്ക്ഷൻ","ജനറലൈസേഷൻ"],
-answer:1,
-exp:"റീൻഫോഴ്‌സ്‌മെന്റ് എന്നത് ഒരു പെരുമാറ്റം വർധിപ്പിക്കാൻ ഉപയോഗിക്കുന്ന പ്രക്രിയയാണ്. ബഹുമതി നൽകുന്നത് പോസിറ്റീവ് റീൻഫോഴ്‌സ്‌മെന്റാണ്. ഉദാഹരണത്തിന്, കുട്ടി ശരിയായി ഉത്തരം പറഞ്ഞാൽ പ്രശംസിക്കുന്നത്."
-},
-
-{
-q:"ഇന്റലിജൻസ് ടെസ്റ്റ് വികസിപ്പിച്ചത് ആര്?",
-options:["പിയാജെ","ബിനെ","സ്കിന്നർ","ഫ്രോയ്ഡ്"],
-answer:1,
-exp:"ആൽഫ്രഡ് ബിനെ ആണ് ആദ്യത്തെ ഇന്റലിജൻസ് ടെസ്റ്റ് വികസിപ്പിച്ചത്. ഇത് കുട്ടികളുടെ ബൗദ്ധിക കഴിവുകൾ അളക്കുന്നതിനാണ് ഉപയോഗിക്കുന്നത്. പിന്നീട് സ്റ്റാൻഫോർഡ്-ബിനെ ടെസ്റ്റായി വികസിപ്പിച്ചു."
-},
-
-{
-q:"പ്രേരണ (Motivation) എന്നത് എന്താണ്?",
-options:["പഠനം","പ്രവർത്തനം","പ്രവർത്തനത്തിന് പ്രേരിപ്പിക്കുന്ന ശക്തി","ശിക്ഷ"],
-answer:2,
-exp:"പ്രേരണ എന്നത് ഒരു വ്യക്തിയെ പ്രവർത്തനത്തിലേക്ക് നയിക്കുന്ന ആന്തരികമോ ബാഹ്യമായോ ഉള്ള ശക്തിയാണ്. ഇത് ലക്ഷ്യസാധനത്തിനുള്ള ആവേശവും ഉത്സാഹവും നൽകുന്നു."
-},
-
-{
-q:"ഫോർമൽ ഓപ്പറേഷണൽ ഘട്ടം ഏത് പ്രായത്തിൽ ആരംഭിക്കുന്നു?",
-options:["0-2","2-7","7-11","11+ "],
-answer:3,
-exp:"പിയാജെയുടെ സിദ്ധാന്തപ്രകാരം ഫോർമൽ ഓപ്പറേഷണൽ ഘട്ടം 11 വയസിന് ശേഷം ആരംഭിക്കുന്നു. ഈ ഘട്ടത്തിൽ കുട്ടികൾ ആബ്സ്ട്രാക്റ്റ് ചിന്തയും ലോജിക്കൽ റീസണിംഗും വികസിപ്പിക്കുന്നു."
-},
-
-{
-q:"കുട്ടികളുടെ സാമൂഹിക വികസനവുമായി ബന്ധപ്പെട്ടത് ഏത്?",
-options:["ഭാഷ","ബുദ്ധി","സമൂഹ ബന്ധങ്ങൾ","സ്മരണം"],
-answer:2,
-exp:"സാമൂഹിക വികസനം എന്നത് കുട്ടി സമൂഹവുമായി എങ്ങനെ ഇടപെടുന്നു എന്നതാണ്. കൂട്ടുകാർ, കുടുംബം, അധ്യാപകർ എന്നിവരുമായി ബന്ധം സ്ഥാപിക്കൽ ഇതിൽ ഉൾപ്പെടുന്നു."
-},
-
-{
-q:"IQ എന്നത് എന്തിന്റെ ചുരുക്കപ്പേരാണ്?",
-options:["Intelligent Quality","Intelligence Quotient","Internal Quality","Intelligent Question"],
-answer:1,
-exp:"IQ എന്നത് Intelligence Quotient എന്നതിന്റെ ചുരുക്കപ്പേരാണ്. ഇത് ഒരു വ്യക്തിയുടെ ബൗദ്ധിക ശേഷി അളക്കുന്നതിനുള്ള മാനദണ്ഡമാണ്."
-},
-
-{
-q:"ശിക്ഷ നൽകുന്നത് എന്തിന്?",
-options:["പഠനം വർധിപ്പിക്കാൻ","പെരുമാറ്റം കുറയ്ക്കാൻ","പ്രേരണ നൽകാൻ","അഭ്യാസം ചെയ്യാൻ"],
-answer:1,
-exp:"ശിക്ഷ (Punishment) ഉപയോഗിക്കുന്നത് ഒരു തെറ്റായ പെരുമാറ്റം കുറയ്ക്കുന്നതിനാണ്. ഇത് നെഗറ്റീവ് റീൻഫോഴ്‌സ്‌മെന്റുമായി ബന്ധപ്പെട്ടു കാണപ്പെടുന്നു."
-},
-
-{
-q:"ഭാഷാ വികസനത്തിൽ പ്രധാനപ്പെട്ട ഘടകം ഏത്?",
-options:["പരിസ്ഥിതി","ഭക്ഷണം","വ്യായാമം","ഉറക്കം"],
-answer:0,
-exp:"ഭാഷാ വികസനത്തിൽ പരിസ്ഥിതി പ്രധാനപ്പെട്ട ഘടകമാണ്. കുട്ടികൾ അവരുടെ ചുറ്റുപാടുകളിൽ നിന്നാണ് ഭാഷ പഠിക്കുന്നത്. മാതാപിതാക്കളുടെ സംഭാഷണം വളരെ സ്വാധീനിക്കുന്നു."
-},
-
-{
-q:"Learning by doing എന്ന ആശയം അവതരിപ്പിച്ചത് ആര്?",
-options:["ജോൺ ഡ്യൂവി","പിയാജെ","സ്കിന്നർ","ഫ്രോയ്ഡ്"],
-answer:0,
-exp:"ജോൺ ഡ്യൂവി ആണ് 'Learning by Doing' എന്ന ആശയം അവതരിപ്പിച്ചത്. പ്രവർത്തനത്തിലൂടെ പഠിക്കുന്നത് കൂടുതൽ ഫലപ്രദമാണെന്ന് അദ്ദേഹം പറഞ്ഞു."
+exp:"Intelligence Quotient (IQ) എന്നത് ബുദ്ധിശേഷി അളക്കാനുള്ള ഒരു മാനദണ്ഡമാണ്."
 }
-{q:"Learning by imitation is called?",options:["Insight","Trial","Observation","Conditioning"],answer:2,exp:"Learning by observing others is called observational learning."}
+],
+
+maths: [
+{
+q:"5 + 3 = ?",
+options:["6","7","8","9"],
+answer:2,
+exp:"5 + 3 ചേർത്താൽ 8 ലഭിക്കും. ഇത് അടിസ്ഥാന ഗണിതമാണ്."
+}
 ]
 
 };
 
-let questions=[],index=0,score=0,selected=null;
+let Q=[],i=0,score=0,selected=null,answered=false;
 
 /* START */
-function startQuiz(sub){
-questions = database[sub];
-start();
+function start(sub){
+Q = DB[sub];
+init();
 }
 
 function startMock(){
-questions = [].concat(
-database.maths,
-database.science,
-database.social,
-database.gk,
-database.malayalam,
-database.english,
-database.psychology
-);
-start();
+Q = [...DB.psychology, ...DB.maths];
+init();
 }
 
-function start(){
-index=0;score=0;
-show("quizScreen");
-loadQ();
+function init(){
+i=0;score=0;
+show("quiz");
+load();
 }
 
 /* LOAD */
-function loadQ(){
+function load(){
 selected=null;
+answered=false;
 document.getElementById("explanation").innerText="";
 
-let q=questions[index];
-document.getElementById("qText").innerText=q.q;
+let q=Q[i];
+document.getElementById("question").innerText=q.q;
 
 let html="";
-q.options.forEach((o,i)=>{
-html+=`<div class="option" onclick="selectOpt(this,${i})">${o}</div>`;
+q.options.forEach((opt,index)=>{
+html+=`<div class="option" onclick="select(this,${index})">${opt}</div>`;
 });
 document.getElementById("options").innerHTML=html;
 }
 
 /* SELECT */
-function selectOpt(el,i){
-selected=i;
+function select(el,index){
+if(answered) return;
+selected=index;
+
 document.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
 el.classList.add("selected");
 }
 
 /* SUBMIT */
-function submitAnswer(){
-if(selected==null)return;
+function submit(){
+if(selected===null || answered) return;
 
-let q=questions[index];
+answered=true;
+
+let q=Q[i];
 let opts=document.querySelectorAll(".option");
 
-if(selected==q.answer){
+if(selected===q.answer){
 opts[selected].classList.add("correct");
 score++;
 }else{
@@ -399,20 +234,24 @@ document.getElementById("explanation").innerText=q.exp;
 }
 
 /* NAV */
-function nextQ(){
-if(index<questions.length-1){index++;loadQ();}
-else finish();
+function next(){
+if(i<Q.length-1){
+i++; load();
+}else{
+finish();
+}
 }
 
-function prevQ(){
-if(index>0){index--;loadQ();}
+function prev(){
+if(i>0){
+i--; load();
+}
 }
 
 /* RESULT */
 function finish(){
-show("resultScreen");
-document.getElementById("finalScore").innerText=
-"Score: "+score+" / "+questions.length;
+show("result");
+document.getElementById("final").innerText="Score: "+score+" / "+Q.length;
 }
 
 /* UI */
@@ -421,11 +260,11 @@ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-function restart(){
-show("subjectScreen");
+function goHome(){
+show("home");
 }
 
 </script>
 
 </body>
-  </html>
+</html>
